@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Tema claro */
+body.light-theme {
+  background-color: white;
+  color: black;
+}
+
+
+
+body.light-theme h1,
+body.light-theme h2,
+body.light-theme h3,
+body.light-theme h4,
+body.light-theme h5,
+body.light-theme h6 {
+  color: black;
+}
+
+body.light-theme .method-container {
+  background-color: white;
+  color: black;
+  border: 1px solid #000;
+
+}
+
+body.dark-theme .method-container {
+  background-color: rgb(0, 0, 0);
+  color: #fff;
+  border: 1px solid #fff;
+
+}
+
+body.light-theme h3,
+strong {
+  color: black;
+}
+
+body.light-theme a {
+  color: rgb(0, 0, 0);
+}
+
+body.light-theme .Handlebutton {
+  color: rgb(255, 255, 255);
+}
+
+body.dark-theme .Handlebutton {
+  color: rgb(255, 255, 255);
+  background-color: blue;
+}
+
+body.dark-theme .Handlebutton:disabled {
+  opacity: 0.6;
+  background-color: red;
+}
+/* Tema oscuro */
+body.dark-theme {
+  background-color: black;
+  color: white;
+}
+
+body.dark-theme input,
+body.dark-theme button,
+body.dark-theme select,
+body.dark-theme td {
+  color: white;
+  background-color: #333; /* Fondo oscuro para inputs y botones */
+  border: 1px solid #555;
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3,
+body.dark-theme h4,
+body.dark-theme h5,
+body.dark-theme h6 {
+  color: rgb(255, 255, 255);
+}
+
+body.dark-theme strong,
+a {
+  color: white;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button::disabled{
+  opacity: 0.6;
+  background-color: red;
+}
+
+button {
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+  transition: transform 0.3s ease;
+}
+button:hover {
+  border: 1px solid black;
+  transform: scale(1.01);
+  outline: none;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: black;
+  }
+  button {
+    background-color: #f9f9f9;
+    color: #000;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #ffffff;
+    background-color: #000000;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #ffffff;
+    color: #000;
+  }
+}

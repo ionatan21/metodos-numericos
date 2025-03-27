@@ -1,0 +1,62 @@
+.container-theme {
+  background-size: cover;
+  background-repeat: no-repeat;
+  width: 45px;
+  height: 45px;
+  border: none !important;
+  background-color: transparent !important;
+  background-size: 40px;
+  background-clip: content-box;
+  cursor: pointer;
+  transition: 0.2s all ease-in;
+}
+
+.container-theme:hover {
+  scale: 1.1;
+}
+
+.container-theme.dark-theme {
+  background-image: url("/public/sun-solid.svg");
+  animation: dark linear;
+  transition: 1s ease-in-out;
+}
+
+.container-theme.light-theme {
+  background-image: url("/public/moon-solid.svg");
+  animation: ligth linear;
+  transition: 1s ease-in-out;
+}
+
+@media (max-width : 600px) {
+    .container-theme {
+       background-size: 30px;
+       width: 35px;
+       height: 35px;
+       background-clip: content-box;
+    }
+
+}
+
+@keyframes ligth {
+  from 0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to 100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+@keyframes dark {
+    from 0% {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+  
+    to 100% {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }

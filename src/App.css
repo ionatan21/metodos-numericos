@@ -1,0 +1,31 @@
+#root {
+  max-width: 1280px;
+  text-align: center;
+}
+
+@import "tailwindcss";
+
+.dark-theme{
+  --color-list: #ff8c00;
+  --calc-logo: url("/public/calculator-solid.svg");
+  --info-logo: url("/public/circle-info-solid.svg");
+  --ejemp-logo: url("/public/list-solid.svg");
+}
+.light-theme{
+  --color-list: #009dff;
+  --calc-logo: url("/public/calculator-solid-black.svg");
+  --info-logo: url("/public/circle-info-solid-black.svg");
+  --ejemp-logo: url("/public/list-solid-black.svg");
+}
+
+
+
+body{
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.4s;
+}
+
