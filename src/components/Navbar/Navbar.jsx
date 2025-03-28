@@ -32,7 +32,7 @@ const Navbar = () => {
   }, [theme]);
 
   return (
-    <section className="navbar-container">
+    <section className="navbar-container animate-fade-in-down">
       <nav className="navbar">
         <a
           className="Logo"
@@ -48,9 +48,9 @@ const Navbar = () => {
         </div>
 
         <div className="optionsMobile">
-          <Link to="/" className="calc-icon"></Link>
-          <Link to="/secante" className="prop-icon"></Link>
-          <Link to="/regla-falsa" className="ejemp-icon"></Link>
+          <Link to="/" className="calc-icon">Bis</Link>
+          <Link to="/secante" className="prop-icon">Sec</Link>
+          <Link to="/regla-falsa" className="ejemp-icon">RegF</Link>
         </div>
         <Theme toggleTheme={toggleTheme} theme={theme} />
       </nav>

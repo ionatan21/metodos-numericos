@@ -79,22 +79,25 @@
   }
 
   .calc-icon {
-    background-image: var(--calc-logo);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: brown;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
     width: 35px !important;
     height: 35px !important;
     border: none !important;
     background-color: transparent !important;
     background-size: contain;
+
   }
 
   .prop-icon {
-    background-image: var(--info-logo);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: brown;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
     width: 35px !important;
     height: 35px !important;
     border: none !important;
@@ -103,10 +106,11 @@
   }
 
   .ejemp-icon {
-    background-image: var(--ejemp-logo);
-    background-repeat: no-repeat;
-    background-position: center;
-    background-color: brown;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
     width: 35px !important;
     height: 35px !important;
     border: none !important;

@@ -4,9 +4,9 @@ import Modal from "../Utils/Modal";
 import "./Biseccion.css";
 
 export default function Biseccion() {
-  const [ecuacion, setEcuacion] = useState("x^3 - x - 2");
-  const [a, setA] = useState(1);
-  const [b, setB] = useState(2);
+  const [ecuacion, setEcuacion] = useState("sqrt(x)-cos(x)");
+  const [a, setA] = useState(0);
+  const [b, setB] = useState(1);
   const [resultados, setResultados] = useState([]);
   const [error, setError] = useState(null);
 
@@ -92,7 +92,7 @@ export default function Biseccion() {
   };
 
   return (
-    <section className="biseccion-container mt-24 transition-all duration-300">
+    <section className="biseccion-container mt-24 mb-5 transition-all duration-300 animate-fade-in-down">
       <button
         onClick={openModal}
         className="rounded-md mb-4 border-2 transform disabled:opacity-50"
