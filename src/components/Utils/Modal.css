@@ -3,3 +3,7 @@
     color: black !important;
   }
 }
+
+.modal{
+    position: fixed !important;
+}

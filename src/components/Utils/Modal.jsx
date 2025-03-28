@@ -8,8 +8,8 @@ const Modal = ({ isOpen, closeModal, title, explanation }) => {
   const explanationParts = explanation.split("//");
 
   return (
-    <div className="fixed h-screen  inset-0 flex justify-center items-center backdrop-blur-sm z-50">
-      <div className="bg-white mt-16 modal-container relative p-6 rounded-lg shadow-lg w-11/12 sm:w-1/3">
+    <div className="fixed modal h-screen inset-0 flex justify-center items-center backdrop-blur-sm z-70">
+      <div className="bg-white w-[90%] mt-16 modal-container relative p-6 rounded-lg shadow-lg">
         <a
           onClick={closeModal}
           className="absolute top-2 right-2 text-xl bg-gray-400 w-6 cursor-pointer rounded-4xl  text-black"
