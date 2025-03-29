@@ -2,7 +2,7 @@ import { evaluate } from "mathjs";
 
 export function evaluarFuncion(ecuacion, x) {
   try {
-    return evaluate(ecuacion, { x });
+    return evaluate(ecuacion, { x }); // Evaluar la función con el valor de x
   } catch (error) {
     return NaN;
   }
@@ -38,6 +38,6 @@ export function metodoBiseccion(ecuacion, a, b, maxIteraciones = 10) {
       fa = fxi;
     }
   }
-
+ 
   return { resultados };
 }

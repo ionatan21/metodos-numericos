@@ -46,7 +46,6 @@ export const metodoSecante = (ecuacion, x0, x1) => {
       errorAbs,
     });
 
-    // Actualizamos los valores para la siguiente iteración
     if (iteracion > 0) {
       console.log(
         `Iteración ${iteracion + 1}: x0 = ${x0}, x1 = ${x1}, xn = ${xn}`
