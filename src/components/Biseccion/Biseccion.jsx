@@ -157,13 +157,13 @@ export default function Biseccion() {
           <div className="grid grid-cols-4 gap-2 mb-4">
             {[
               { label: "x²", value: "^2", latex: "^{2}" },
-              { label: "√x", value: "sqrt(x)", latex: "\\sqrt{x}" },
+              { label: "√x", value: "sqrt(x)", latex: " \\sqrt{x}" },
               { label: "π", value: "pi", latex: " \\pi" },
               { label: "e", value: "e", latex: " e" },
-              { label: "sin", value: "sin(", latex: "\\sin(" },
-              { label: "cos", value: "cos(", latex: "\\cos(" },
-              { label: "tan", value: "tan(", latex: "\\tan(" },
-              { label: "ln", value: "ln(", latex: "\\ln(" },
+              { label: "sin", value: "sin(", latex: " \\sin(" },
+              { label: "cos", value: "cos(", latex: " \\cos(" },
+              { label: "tan", value: "tan(", latex: " \\tan(" },
+              { label: "ln", value: "ln(", latex: " \\ln(" },
               { label: "(", value: "(", latex: "(" },
               { label: ")", value: ")", latex: ")" },
               { label: "^", value: "^", latex: "^{}" },
