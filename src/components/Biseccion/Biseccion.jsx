@@ -68,7 +68,9 @@ export default function Biseccion() {
 
   // Abrir el modal
   const openModal = () => {
-    generarExplicacion();
+    //generarExplicacion();
+    console.log("Ecuación:", ecuacion);
+    console.log("AJAX:", ecuacionajax);
   };
 
   // Cerrar el modal
@@ -77,6 +79,10 @@ export default function Biseccion() {
   };
 
   const calcular = () => {
+
+
+    
+    
     const { resultados, error } = metodoBiseccion(
       ecuacion,
       parseFloat(a),
@@ -125,7 +131,7 @@ export default function Biseccion() {
         <button
           onClick={openModal}
           className="rounded-md mb-4 border-2 transform disabled:opacity-50"
-          disabled={!isEvaluado} // Solo habilita el botón si se ha evaluado correctamente
+           // disabled={!isEvaluado} Solo habilita el botón si se ha evaluado correctamente
         >
           Ver Explicación
         </button>
@@ -163,7 +169,7 @@ export default function Biseccion() {
               { label: "*", value: "*", latex: "\\cdot" }, // Para representar multiplicación en LaTeX
               { label: "+", value: "+", latex: "+" },
               { label: "-", value: "-", latex: "-" },
-              { label: "C", value: "clear", latex: "" }, // No tiene representación en LaTeX
+              { label: "C", value: "clear", latex: "\ " }, // No tiene representación en LaTeX
             ].map((btn) => (
               <button
                 key={btn.label}
