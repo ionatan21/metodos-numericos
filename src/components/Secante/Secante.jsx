@@ -2,9 +2,12 @@ import { useState } from "react";
 import { metodoSecante, evaluarFuncion } from "./functions";
 import Modal from "../Utils/Modal";
 import "./Secante.css";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 
 export default function Secante() {
   const [ecuacion, setEcuacion] = useState("sqrt(x)-cos(x)");
+  const [ecuacionajax, setEcuacionajax] = useState(" \\sqrt{x} -  \\cos(x)");
+
   const [x0, setX0] = useState(0);
   const [x1, setX1] = useState(1);
   const [resultados, setResultados] = useState([]);
@@ -19,9 +22,22 @@ export default function Secante() {
 
     const explicacionGenerada = `
       El Método de Secante se utiliza para encontrar la raíz de una función continua. 
-      // En este caso, tenemos la función f(x) = ${ecuacion}.
-      //Dados los puntos iniciales X0 = ${x0} y X1 = ${x1}, se calcula el siguiente valor Xn utilizando la fórmula:
+      // 1. En este caso, tenemos la función f(x) = ${ecuacion}.
+      //Dados los puntos iniciales X0 = ${x0} y X1 = ${x1}, 
+      // 2. Se calculan los valores de la función en esos puntos:
+      // f(X0) = ${fx0.toFixed(6)} y f(X1) = ${fx1.toFixed(6)}.
+      // 3. Se calcula el siguiente valor Xn utilizando la fórmula:
       //Xn = X1 - (f(X1) * (X1 - X0)) / (f(X1) - f(X0))
+      // 4. Sustituyendo los valores obtenidos, tenemos:
+      // Xn = ${x1} - (${fx1.toFixed(6)} * (${x1} - ${x0})) / (${fx1.toFixed(
+      6
+    )} - ${fx0.toFixed(6)}) = ${resultados[0]?.xn.toFixed(6)}
+      // 5. Ahora se evalúa la función en el nuevo punto Xn:
+      // f(Xn) = ${resultados[0]?.fxn.toFixed(6)}
+      // 6. En cada iteración, se repiten los pasos anteriores, actualizando los valores de X0 y X1 con el valor de Xn y Xn-1.
+      // en este caso el nuevo valor para segunda iteración de X0 es ${resultados[0]?.xn.toFixed(
+        6
+      )} y el nuevo valor de X1 es ${x1}.
       //Este proceso se repite iterativamente hasta obtener una aproximación suficiente.
     `;
 
@@ -37,18 +53,13 @@ export default function Secante() {
     setIsModalOpen(false);
   };
 
-  const convertirEcuacion = (input) => {
-    return input
-      .replace(/\\sqrt\{([^}]+)\}/g, "sqrt($1)")
-      .replace(/\\cos\(([^)]+)\)/g, "cos($1)")
-      .replace(/\\sin\(([^)]+)\)/g, "sin($1)")
-      .replace(/\\tan\(([^)]+)\)/g, "tan($1)")
-      .replace(/\\pi/g, "pi")
-      .replace(/\be\b/g, "e");
-  };
+  function formatMathJaxString(input) {
+    return input.replace(/\\/g, "").replace(/{/g, "(").replace(/}/g, ")");
+  }
 
   const handleChange = (e) => {
-    const ecuacionTransformada = convertirEcuacion(e.target.value);
+    setEcuacionajax(e.target.value);
+    const ecuacionTransformada = formatMathJaxString(e.target.value);
     setEcuacion(ecuacionTransformada);
   };
 
@@ -69,8 +80,13 @@ export default function Secante() {
     }
   };
 
+  // Agregar expresión seleccionada en el input
   const insertarEnInput = (valor) => {
     setEcuacion((prev) => prev + valor);
+  };
+
+  const insertarEnAjax = (valor) => {
+    ecuacionajax((prev) => prev + valor);
   };
 
   return (
@@ -95,12 +111,17 @@ export default function Secante() {
           <h2 className="text-2xl font-bold my-4">Método de Secante</h2>
           <div className="mb-4">
             <label className="block font-semibold">Ecuación:</label>
-            <input
-              type="text"
-              value={ecuacion}
-              onChange={handleChange}
-              className="border p-2 w-full rounded-lg text-center"
-            />
+            <div className="mt-4 p-2 bg-transparent rounded-lg text-center">
+              <input
+                type="text"
+                value={ecuacionajax}
+                onChange={handleChange}
+                className="border p-2 w-full rounded-lg text-center mb-4"
+              />
+              <MathJaxContext>
+                <MathJax>{"\\(" + ecuacionajax + "\\)"}</MathJax>
+              </MathJaxContext>
+            </div>
           </div>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {[

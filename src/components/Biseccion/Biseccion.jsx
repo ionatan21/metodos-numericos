@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { metodoBiseccion, evaluarFuncion } from "./functions";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 import Modal from "../Utils/Modal";
 import "./Biseccion.css";
 
 export default function Biseccion() {
   const [ecuacion, setEcuacion] = useState("sqrt(x)-cos(x)");
+  const [ecuacionajax, setEcuacionajax] = useState(" \\sqrt{x} -  \\cos(x)");
+
   const [a, setA] = useState(0);
   const [b, setB] = useState(1);
   const [resultados, setResultados] = useState([]);
@@ -18,24 +21,44 @@ export default function Biseccion() {
     // Evaluamos la función en los puntos a y b
     const fa = evaluarFuncion(ecuacion, a);
     const fb = evaluarFuncion(ecuacion, b);
+    const fxi = evaluarFuncion(ecuacion, (a + b) / 2).toFixed(6);
+    let newa = 0;
+    let newb = 0;
+
+    if (fa * fxi < 0) {
+      newa = a;
+      newb = (a + b) / 2;
+    } else {
+      newa = (a + b) / 2;
+      newb = b;
+    }
+
+    if (fa === null || fb === null) {
+      setError("Error al evaluar la función en los puntos dados.");
+      return;
+    }
 
     // Generar la explicación teórica con los valores actuales
     const explicacionGenerada = `
       El Método de Bisección se utiliza para encontrar la raíz de una función continua. En este caso, tenemos la función f(x) = ${ecuacion}.
       //
-      Dado el intervalo [a, b] = [${a}, ${b}], tenemos los siguientes valores:
+      1. Dado el intervalo [a, b] = [${a}, ${b}], tenemos los siguientes valores:
       //
       f(a) = ${fa.toFixed(6)}
       //
       f(b) = ${fb.toFixed(6)}
       //
-      Sabemos que el método de bisección requiere que f(a) y f(b) tengan signos opuestos, lo cual es necesario para garantizar que exista una raíz en el intervalo.
+      2. Sabemos que el método de bisección requiere que f(a) y f(b) tengan signos opuestos, lo cual es necesario para garantizar que exista una raíz en el intervalo.
       //
       En cada iteración, calculamos el punto Xi como la mitad del intervalo:
       //
       Xi = (a + b) / 2 = ${(a + b) / 2}
       //
-      Luego, evaluamos la función en Xi, y dependiendo de si f(Xi) tiene el mismo signo que f(a) o f(b), reducimos el intervalo y repetimos el proceso.
+      3. Luego, evaluamos la función en Xi para determinar el signo de f(Xi):
+      //
+      f(Xi) = ${fxi}
+      //4. En este caso el nuevo intervalo de [a, b] para la segunda iteración es  ${newa} y ${newb}.
+      //5. Repetimos el proceso hasta que la diferencia entre a y b sea suficientemente pequeña.
     `;
 
     // Establecer la explicación generada
@@ -51,21 +74,6 @@ export default function Biseccion() {
   // Cerrar el modal
   const closeModal = () => {
     setIsModalOpen(false);
-  };
-
-  const convertirEcuacion = (input) => {
-    return input
-      .replace(/\\sqrt\{([^}]+)\}/g, "sqrt($1)") // Convierte \sqrt{x} a sqrt(x)
-      .replace(/\\cos\(([^)]+)\)/g, "cos($1)") // Convierte \cos(x) a cos(x)
-      .replace(/\\sin\(([^)]+)\)/g, "sin($1)") // Convierte \sin(x) a sin(x)
-      .replace(/\\tan\(([^)]+)\)/g, "tan($1)") // Convierte \tan(x) a tan(x)
-      .replace(/\\pi/g, "pi") // Convierte \pi a pi (math.js ya lo reconoce)
-      .replace(/\be\b/g, "e"); // Asegura que 'e' sola represente el número de Euler
-  };
-
-  const handleChange = (e) => {
-    const ecuacionTransformada = convertirEcuacion(e.target.value);
-    setEcuacion(ecuacionTransformada);
   };
 
   const calcular = () => {
@@ -90,6 +98,20 @@ export default function Biseccion() {
     setEcuacion((prev) => prev + valor);
   };
 
+  const insertarEnAjax = (valor) => {
+    ecuacionajax((prev) => prev + valor);
+  };
+
+  function formatMathJaxString(input) {
+    return input.replace(/\\/g, "").replace(/{/g, "(").replace(/}/g, ")");
+  }
+
+  const handleChange = (e) => {
+    setEcuacionajax(e.target.value);
+    const ecuacionTransformada = formatMathJaxString(e.target.value);
+    setEcuacion(ecuacionTransformada);
+  };
+
   return (
     <>
       <Modal
@@ -112,39 +134,48 @@ export default function Biseccion() {
           <h2 className="text-2xl font-bold my-4">Método de Bisección</h2>
           <div className="mb-4">
             <label className="block font-semibold">Ecuación:</label>
-            <input
-              type="text"
-              value={ecuacion}
-              onChange={handleChange}
-              className="border p-2 w-full rounded-lg text-center"
-            />
+            <div className="mt-4 p-2 bg-transparent rounded-lg text-center">
+              <input
+                type="text"
+                value={ecuacionajax}
+                onChange={handleChange}
+                className="border p-2 w-full rounded-lg text-center mb-4"
+              />
+              <MathJaxContext>
+                <MathJax>{"\\(" + ecuacionajax + "\\)"}</MathJax>
+              </MathJaxContext>
+            </div>
           </div>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {[
-              { label: "x²", value: "^2" },
-              { label: "√x", value: "sqrt(" },
-              { label: "π", value: "pi" },
-              { label: "e", value: "e" },
-              { label: "sin", value: "sin(" },
-              { label: "cos", value: "cos(" },
-              { label: "tan", value: "tan(" },
-              { label: "ln", value: "ln(" },
-              { label: "(", value: "(" },
-              { label: ")", value: ")" },
-              { label: "^", value: "^" },
-              { label: "/", value: "/" },
-              { label: "*", value: "*" },
-              { label: "+", value: "+" },
-              { label: "-", value: "-" },
-              { label: "C", value: "clear" },
+              { label: "x²", value: "^2", latex: "^{2}" },
+              { label: "√x", value: "sqrt(x)", latex: "\\sqrt{x}" },
+              { label: "π", value: "pi", latex: " \\pi" },
+              { label: "e", value: "e", latex: " e" },
+              { label: "sin", value: "sin(", latex: "\\sin(" },
+              { label: "cos", value: "cos(", latex: "\\cos(" },
+              { label: "tan", value: "tan(", latex: "\\tan(" },
+              { label: "ln", value: "ln(", latex: "\\ln(" },
+              { label: "(", value: "(", latex: "(" },
+              { label: ")", value: ")", latex: ")" },
+              { label: "^", value: "^", latex: "^{}" },
+              { label: "/", value: "/", latex: "/" },
+              { label: "*", value: "*", latex: "\\cdot" }, // Para representar multiplicación en LaTeX
+              { label: "+", value: "+", latex: "+" },
+              { label: "-", value: "-", latex: "-" },
+              { label: "C", value: "clear", latex: "" }, // No tiene representación en LaTeX
             ].map((btn) => (
               <button
                 key={btn.label}
                 className="bg-gray-200 border-1 opacity-80 hover:opacity-100 border-black p-2 rounded hover:bg-gray-300 shadow-md text-black font-semibold"
                 onClick={() => {
-                  if (btn.value === "clear")
+                  if (btn.value === "clear") {
                     setEcuacion(""); // Botón de limpiar
-                  else insertarEnInput(btn.value);
+                    setEcuacionajax(""); // Limpiar el input de MathJax
+                  } else {
+                    insertarEnInput(btn.value);
+                    insertarEnAjax(btn.latex);
+                  } // Agregar valor al input
                 }}
               >
                 {btn.label}
