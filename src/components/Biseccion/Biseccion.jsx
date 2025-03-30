@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { metodoBiseccion, evaluarFuncion } from "./functions";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
 import Modal from "../Utils/Modal";
@@ -17,6 +17,12 @@ export default function Biseccion() {
   const [explicacion, setExplicacion] = useState("");
   const [isEvaluado, setIsEvaluado] = useState(false); // Estado para controlar la evaluación
   const [mathJaxKey, setMathJaxKey] = useState(0);
+
+  useEffect(() => {
+    if (window.MathJax) {
+      window.MathJax.typeset();
+    }
+  }, [ecuacionajax]);
 
   const generarExplicacion = () => {
     // Evaluamos la función en los puntos a y b
@@ -69,9 +75,7 @@ export default function Biseccion() {
 
   // Abrir el modal
   const openModal = () => {
-    //generarExplicacion();
-    console.log("Ecuación:", ecuacion);
-    console.log("AJAX:", ecuacionajax);
+    generarExplicacion();
   };
 
   // Cerrar el modal
@@ -129,7 +133,7 @@ export default function Biseccion() {
         <button
           onClick={openModal}
           className="rounded-md mb-4 border-2 transform disabled:opacity-50"
-          // disabled={!isEvaluado} Solo habilita el botón si se ha evaluado correctamente
+          disabled={!isEvaluado} //  Solo habilita el botón si se ha evaluado correctamente
         >
           Ver Explicación
         </button>
@@ -175,7 +179,7 @@ export default function Biseccion() {
                 onClick={() => {
                   if (btn.value === "clear") {
                     setEcuacion(""); // Botón de limpiar
-                    setEcuacionajax(""); // Limpiar el input de MathJax
+                    setEcuacionajax(" "); // Limpiar el input de MathJax
                   } else {
                     insertarEnInput(btn.value);
                     insertarEnAjax(btn.latex);
