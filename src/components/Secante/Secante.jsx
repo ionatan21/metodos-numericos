@@ -86,7 +86,7 @@ export default function Secante() {
   };
 
   const insertarEnAjax = (valor) => {
-    ecuacionajax((prev) => prev + valor);
+    setEcuacionajax((prev) => prev + valor);
   };
 
   return (
@@ -125,29 +125,34 @@ export default function Secante() {
           </div>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {[
-              { label: "x²", value: "^2" },
-              { label: "√x", value: "sqrt(" },
-              { label: "π", value: "pi" },
-              { label: "e", value: "e" },
-              { label: "sin", value: "sin(" },
-              { label: "cos", value: "cos(" },
-              { label: "tan", value: "tan(" },
-              { label: "ln", value: "ln(" },
-              { label: "(", value: "(" },
-              { label: ")", value: ")" },
-              { label: "^", value: "^" },
-              { label: "/", value: "/" },
-              { label: "*", value: "*" },
-              { label: "+", value: "+" },
-              { label: "-", value: "-" },
-              { label: "C", value: "clear" },
+              { label: "x²", value: "^2", latex: "^{2}" },
+              { label: "√x", value: "sqrt(x)", latex: "\\sqrt{x}" },
+              { label: "π", value: "pi", latex: " \\pi" },
+              { label: "e", value: "e", latex: " e" },
+              { label: "sin", value: "sin(", latex: "\\sin(" },
+              { label: "cos", value: "cos(", latex: "\\cos(" },
+              { label: "tan", value: "tan(", latex: "\\tan(" },
+              { label: "ln", value: "ln(", latex: "\\ln(" },
+              { label: "(", value: "(", latex: "(" },
+              { label: ")", value: ")", latex: ")" },
+              { label: "^", value: "^", latex: "^{}" },
+              { label: "/", value: "/", latex: "/" },
+              { label: "*", value: "*", latex: "\\cdot" }, // Para representar multiplicación en LaTeX
+              { label: "+", value: "+", latex: "+" },
+              { label: "-", value: "-", latex: "-" },
+              { label: "C", value: "clear", latex: "" }, // No tiene representación en LaTeX
             ].map((btn) => (
               <button
                 key={btn.label}
                 className="bg-gray-200 border-1 opacity-80 hover:opacity-100 border-black p-2 rounded hover:bg-gray-300 shadow-md text-black font-semibold"
                 onClick={() => {
-                  if (btn.value === "clear") setEcuacion("");
-                  else insertarEnInput(btn.value);
+                  if (btn.value === "clear") {
+                    setEcuacion(""); // Botón de limpiar
+                    setEcuacionajax(""); // Limpiar el input de MathJax
+                  } else {
+                    insertarEnInput(btn.value);
+                    insertarEnAjax(btn.latex);
+                  } // Agregar valor al input
                 }}
               >
                 {btn.label}

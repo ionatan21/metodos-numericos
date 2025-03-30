@@ -99,7 +99,7 @@ export default function Biseccion() {
   };
 
   const insertarEnAjax = (valor) => {
-    ecuacionajax((prev) => prev + valor);
+    setEcuacionajax((prev) => prev + valor);
   };
 
   function formatMathJaxString(input) {
