@@ -16,6 +16,7 @@ export default function Biseccion() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [explicacion, setExplicacion] = useState("");
   const [isEvaluado, setIsEvaluado] = useState(false); // Estado para controlar la evaluación
+  const [mathJaxKey, setMathJaxKey] = useState(0);
 
   const generarExplicacion = () => {
     // Evaluamos la función en los puntos a y b
@@ -79,10 +80,6 @@ export default function Biseccion() {
   };
 
   const calcular = () => {
-
-
-    
-    
     const { resultados, error } = metodoBiseccion(
       ecuacion,
       parseFloat(a),
@@ -116,6 +113,7 @@ export default function Biseccion() {
     setEcuacionajax(e.target.value);
     const ecuacionTransformada = formatMathJaxString(e.target.value);
     setEcuacion(ecuacionTransformada);
+    setMathJaxKey((prevKey) => prevKey + 1);
   };
 
   return (
@@ -131,7 +129,7 @@ export default function Biseccion() {
         <button
           onClick={openModal}
           className="rounded-md mb-4 border-2 transform disabled:opacity-50"
-           // disabled={!isEvaluado} Solo habilita el botón si se ha evaluado correctamente
+          // disabled={!isEvaluado} Solo habilita el botón si se ha evaluado correctamente
         >
           Ver Explicación
         </button>
@@ -147,7 +145,7 @@ export default function Biseccion() {
                 onChange={handleChange}
                 className="border p-2 w-full rounded-lg text-center mb-4"
               />
-              <MathJaxContext>
+              <MathJaxContext key={mathJaxKey}>
                 <MathJax>{"\\(" + ecuacionajax + "\\)"}</MathJax>
               </MathJaxContext>
             </div>
@@ -169,7 +167,7 @@ export default function Biseccion() {
               { label: "*", value: "*", latex: "\\cdot" }, // Para representar multiplicación en LaTeX
               { label: "+", value: "+", latex: "+" },
               { label: "-", value: "-", latex: "-" },
-              { label: "C", value: "clear", latex: "\ " }, // No tiene representación en LaTeX
+              { label: "C", value: "clear", latex: " " }, // No tiene representación en LaTeX
             ].map((btn) => (
               <button
                 key={btn.label}
