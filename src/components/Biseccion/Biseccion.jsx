@@ -11,6 +11,10 @@ export default function Biseccion() {
   const [a, setA] = useState(0);
   const [b, setB] = useState(1);
   const [resultados, setResultados] = useState([]);
+  const [resultadosSn, setResultadosSn] = useState([]);
+  const [mostrarNotacionCientifica, setMostrarNotacionCientifica] =
+    useState(true);
+
   const [error, setError] = useState(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,6 +87,39 @@ export default function Biseccion() {
     setIsModalOpen(false);
   };
 
+  function toScientificNotation(num, precision = 1) {
+    if (num === 0) return "0"; // Manejar el caso especial de 0
+    let exponent = Math.floor(Math.log10(Math.abs(num)));
+    let coefficient = (num / Math.pow(10, exponent)).toFixed(precision);
+    return `${coefficient}*10^${exponent}`;
+  }
+
+  function convertArrayToScientific(arr) {
+    return arr.map((entry) => {
+      let newEntry = { ...entry };
+      for (let key in entry) {
+        if (key !== "iteracion" && typeof entry[key] === "number") {
+          newEntry[key] = toScientificNotation(entry[key]);
+        }
+      }
+      return newEntry;
+    });
+  }
+
+  function redondearDatos(array) {
+    return array.map((obj) => ({
+      iteracion: obj.iteracion, // Mantener la iteración sin cambios
+      ...Object.fromEntries(
+        Object.entries(obj)
+          .filter(([key]) => key !== "iteracion") // Excluir "iteracion" del procesamiento
+          .map(([key, value]) => [
+            key,
+            typeof value === "number" ? parseFloat(value.toFixed(6)) : value,
+          ])
+      ),
+    }));
+  }
+
   const calcular = () => {
     const { resultados, error } = metodoBiseccion(
       ecuacion,
@@ -95,9 +132,17 @@ export default function Biseccion() {
       setIsEvaluado(false); // Si hay un error, no se puede habilitar el botón
     } else {
       setError(null);
-      setResultados(resultados);
+      setResultados(redondearDatos(resultados)); // Redondear a 6 decimales
+      setResultadosSn(convertArrayToScientific(resultados)); // Convertir a notación científica
+
       setIsEvaluado(true); // La ecuación fue evaluada con éxito
     }
+    const result = document.getElementById("resultado");
+    setTimeout(() => {
+      if (result) {
+        result.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   };
 
   // Agregar expresión seleccionada en el input
@@ -210,43 +255,61 @@ export default function Biseccion() {
               />
             </div>
           </div>
-          <button
-            onClick={calcular}
-            className="bg-gray-400 w-36 border-1 border-black border-e-black shadow-md text-black px-4 py-2 rounded"
-          >
-            Calcular
-          </button>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
-          {resultados.length > 0 && (
-            <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr>
-                    <th className="border p-2">Iteración</th>
-                    <th className="border p-2">a</th>
-                    <th className="border p-2">b</th>
-                    <th className="border p-2">Xi</th>
-                    <th className="border p-2">f(a)</th>
-                    <th className="border p-2">f(b)</th>
-                    <th className="border p-2">f(Xi)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {resultados.map(({ iteracion, a, b, xi, fa, fb, fxi }) => (
-                    <tr key={iteracion}>
-                      <td className="border p-2">{iteracion}</td>
-                      <td className="border p-2">{a.toFixed(6)}</td>
-                      <td className="border p-2">{b.toFixed(6)}</td>
-                      <td className="border p-2">{xi.toFixed(6)}</td>
-                      <td className="border p-2">{fa.toFixed(6)}</td>
-                      <td className="border p-2">{fb.toFixed(6)}</td>
-                      <td className="border p-2">{fxi.toFixed(6)}</td>
+
+          <div className="w-full  flex justify-center items-center mt-4">
+            <button
+              onClick={calcular}
+              className="bg-gray-400 h-11 w-full border-1 border-black border-e-black shadow-md text-black px-4 py-[10px] rounded"
+            >
+              Calcular
+            </button>
+
+            <select
+              className="ml-4 border-1 h-11 w-full border-black rounded-lg px-4 py-[10px]"
+              onChange={(e) =>
+                setMostrarNotacionCientifica(e.target.value === "sn")
+              }
+            >
+              <option value="sn">Not Científica</option>
+              <option value="decimal">Not Decimal</option>
+            </select>
+          </div>
+          <section id="resultado">
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+            {resultados.length > 0 && (
+              <div className="mt-4 overflow-x-auto animate-fade-in-down">
+                <table className="min-w-full border-collapse border border-gray-300">
+                  <thead>
+                    <tr>
+                      <th className="border p-2">Iteración</th>
+                      <th className="border p-2">a</th>
+                      <th className="border p-2">b</th>
+                      <th className="border p-2">Xi</th>
+                      <th className="border p-2">f(a)</th>
+                      <th className="border p-2">f(b)</th>
+                      <th className="border p-2">f(Xi)</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {(mostrarNotacionCientifica
+                      ? resultadosSn
+                      : resultados
+                    ).map((row, index) => (
+                      <tr key={index}>
+                        <td className="border p-2">{row.iteracion}</td>
+                        <td className="border p-2">{row.a}</td>
+                        <td className="border p-2">{row.b}</td>
+                        <td className="border p-2">{row.xi}</td>
+                        <td className="border p-2">{row.fa}</td>
+                        <td className="border p-2">{row.fb}</td>
+                        <td className="border p-2">{row.fxi}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </div>
       </section>
     </>

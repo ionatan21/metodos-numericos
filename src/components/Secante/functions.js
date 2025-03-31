@@ -47,9 +47,6 @@ export const metodoSecante = (ecuacion, x0, x1) => {
     });
 
     if (iteracion > 0) {
-      console.log(
-        `Iteración ${iteracion + 1}: x0 = ${x0}, x1 = ${x1}, xn = ${xn}`
-      );
 
       if (xn < previoXn) {
         x1 = previoXn;
@@ -59,17 +56,12 @@ export const metodoSecante = (ecuacion, x0, x1) => {
         x0 = previoXn;
       }
     } else {
-      console.log(
-        `Else / Iteración ${iteracion + 1}: x0 = ${x0}, x1 = ${x1}, xn = ${xn}`
-      );
 
       if (xn < x1) {
-        console.log(xn + " < " + x1);
 
         x1 = x1;
         x0 = xn;
       } else {
-        console.log(xn + " > " + x1);
         x0 = x1; // 2
         x1 = xn; // 3
       }

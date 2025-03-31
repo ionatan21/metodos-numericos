@@ -11,6 +11,9 @@ export default function Secante() {
   const [x0, setX0] = useState(0);
   const [x1, setX1] = useState(1);
   const [resultados, setResultados] = useState([]);
+  const [resultadosSn, setResultadosSn] = useState([]);
+  const [mostrarNotacionCientifica, setMostrarNotacionCientifica] =
+    useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [explicacion, setExplicacion] = useState("");
@@ -63,6 +66,39 @@ export default function Secante() {
     setIsModalOpen(false);
   };
 
+  function toScientificNotation(num, precision = 1) {
+    if (num === 0) return "0"; // Manejar el caso especial de 0
+    let exponent = Math.floor(Math.log10(Math.abs(num)));
+    let coefficient = (num / Math.pow(10, exponent)).toFixed(precision);
+    return `${coefficient}*10^${exponent}`;
+  }
+
+  function convertArrayToScientific(arr) {
+    return arr.map((entry) => {
+      let newEntry = { ...entry };
+      for (let key in entry) {
+        if (key !== "iteracion" && typeof entry[key] === "number") {
+          newEntry[key] = toScientificNotation(entry[key]);
+        }
+      }
+      return newEntry;
+    });
+  }
+
+  function redondearDatos(array) {
+    return array.map((obj) => ({
+      iteracion: obj.iteracion, // Mantener la iteración sin cambios
+      ...Object.fromEntries(
+        Object.entries(obj)
+          .filter(([key]) => key !== "iteracion") // Excluir "iteracion" del procesamiento
+          .map(([key, value]) => [
+            key,
+            typeof value === "number" ? parseFloat(value.toFixed(6)) : value,
+          ])
+      ),
+    }));
+  }
+
   function formatMathJaxString(input) {
     return input.replace(/\\/g, "").replace(/{/g, "(").replace(/}/g, ")");
   }
@@ -86,9 +122,17 @@ export default function Secante() {
       setIsEvaluado(false);
     } else {
       setError(null);
-      setResultados(resultados);
+
+      setResultados(redondearDatos(resultados)); // Redondear a 6 decimales
+      setResultadosSn(convertArrayToScientific(resultados)); // Convertir a notación científica
       setIsEvaluado(true);
     }
+    const result = document.getElementById("resultado");
+    setTimeout(() => {
+      if (result) {
+        result.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
   };
 
   // Agregar expresión seleccionada en el input
@@ -177,7 +221,7 @@ export default function Secante() {
                 type="number"
                 value={x0}
                 onChange={(e) => setX0(e.target.value)}
-                className="border p-2 w-full rounded-lg text-center"
+                className="border p-2 w-full rounded-lg text-center shadow-md"
               />
             </div>
             <div>
@@ -186,53 +230,69 @@ export default function Secante() {
                 type="number"
                 value={x1}
                 onChange={(e) => setX1(e.target.value)}
-                className="border p-2 w-full rounded-lg text-center"
+                className="border p-2 w-full rounded-lg text-center shadow-md"
               />
             </div>
           </div>
-          <button
-            onClick={calcular}
-            className="bg-gray-400 w-36 border-1 border-black border-e-black shadow-md text-black px-4 py-2 rounded"
-          >
-            Calcular
-          </button>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
-          {resultados.length > 0 && (
-            <div className="mt-4 overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr>
-                    <th className="border p-2">Iteración</th>
-                    <th className="border p-2">X0</th>
-                    <th className="border p-2">f(X0)</th>
-                    <th className="border p-2">X1</th>
-                    <th className="border p-2">f(X1)</th>
-                    <th className="border p-2">Xn</th>
-                    <th className="border p-2">f(Xn)</th>
-                    <th className="border p-2">Error Abs</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {resultados.map(
-                    ({ iteracion, x0, fx0, x1, fx1, xn, fxn, errorAbs }) => (
-                      <tr key={iteracion}>
-                        <td className="border p-2">{iteracion}</td>
-                        <td className="border p-2">{x0.toFixed(6)}</td>
-                        <td className="border p-2">{fx0.toFixed(6)}</td>
-                        <td className="border p-2">{x1.toFixed(6)}</td>
-                        <td className="border p-2">{fx1.toFixed(6)}</td>
-                        <td className="border p-2">{xn.toFixed(6)}</td>
-                        <td className="border p-2">{fxn.toFixed(6)}</td>
+          <div className="w-full  flex justify-center items-center mt-4">
+            <button
+              onClick={calcular}
+              className="bg-gray-400 h-11 w-full border-1  border-black border-e-black shadow-md text-black px-4 py-[10px] rounded"
+            >
+              Calcular
+            </button>
+
+            <select
+              className="ml-4 border-1 h-11 w-full border-black rounded-lg px-4 py-[10px] shadow-md"
+              onChange={(e) =>
+                setMostrarNotacionCientifica(e.target.value === "sn")
+              }
+            >
+              <option value="sn">Not Científica</option>
+              <option value="decimal">Not Decimal</option>
+            </select>
+          </div>
+
+          <section id="resultado">
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+            {resultados.length > 0 && (
+              <div className="mt-4 overflow-x-auto animate-fade-in-down">
+                <table className="min-w-full border-collapse border border-gray-300">
+                  <thead>
+                    <tr>
+                      <th className="border p-2">Iteración</th>
+                      <th className="border p-2">X0</th>
+                      <th className="border p-2">f(X0)</th>
+                      <th className="border p-2">X1</th>
+                      <th className="border p-2">f(X1)</th>
+                      <th className="border p-2">Xn</th>
+                      <th className="border p-2">f(Xn)</th>
+                      <th className="border p-2">Error Abs</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(mostrarNotacionCientifica
+                      ? resultadosSn
+                      : resultados
+                    ).map((row, index) => (
+                      <tr key={index}>
+                        <td className="border p-2">{row.iteracion}</td>
+                        <td className="border p-2">{row.x0}</td>
+                        <td className="border p-2">{row.fx0}</td>
+                        <td className="border p-2">{row.x1}</td>
+                        <td className="border p-2">{row.fx1}</td>
+                        <td className="border p-2">{row.xn}</td>
+                        <td className="border p-2">{row.fxn}</td>
                         <td className="border p-2">
-                          {errorAbs ? errorAbs.toFixed(6) : "-"}
+                          {row.errorAbs ? row.errorAbs : "-"}
                         </td>
                       </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </div>
       </section>
     </>
