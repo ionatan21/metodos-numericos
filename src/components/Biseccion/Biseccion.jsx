@@ -158,9 +158,18 @@ export default function Biseccion() {
     return input.replace(/\\/g, "").replace(/{/g, "(").replace(/}/g, ")");
   }
 
+  function convertirMinusculas(texto) {
+    return texto.toLowerCase();
+  }
+
+  function enfocarInput() {
+    document.getElementById("miInput").focus();
+  }
+
   const handleChange = (e) => {
-    setEcuacionajax(e.target.value);
-    const ecuacionTransformada = formatMathJaxString(e.target.value);
+    const valor = convertirMinusculas(e.target.value);
+    setEcuacionajax(valor);
+    const ecuacionTransformada = formatMathJaxString(valor);
     setEcuacion(ecuacionTransformada);
     setMathJaxKey((prevKey) => prevKey + 1);
   };
@@ -193,6 +202,7 @@ export default function Biseccion() {
                 value={ecuacionajax}
                 onChange={handleChange}
                 className="border p-2 w-full rounded-lg text-center mb-4"
+                id="miInput"
               />
               <MathJaxContext key={mathJaxKey}>
                 <MathJax>{"\\(" + ecuacionajax + "\\)"}</MathJax>
@@ -225,9 +235,11 @@ export default function Biseccion() {
                   if (btn.value === "clear") {
                     setEcuacion(""); // Botón de limpiar
                     setEcuacionajax(" "); // Limpiar el input de MathJax
+                    enfocarInput();
                   } else {
                     insertarEnInput(btn.value);
                     insertarEnAjax(btn.latex);
+                    enfocarInput();
                   } // Agregar valor al input
                 }}
               >
