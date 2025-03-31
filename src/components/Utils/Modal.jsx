@@ -9,7 +9,7 @@ const Modal = ({ isOpen, closeModal, title, explanation }) => {
 
   return (
     <div className="fixed modal h-screen inset-0 flex justify-center items-center backdrop-blur-sm z-70">
-      <div className="bg-white w-fit mx-3.5 mt-20 overflow-y-auto modal-container relative p-6 rounded-lg shadow-lg">
+      <div className="bg-white w-fit mx-3.5 mt-16 animate-fade-in-down overflow-y-auto modal-container relative p-6 rounded-lg shadow-lg">
         <a
           onClick={closeModal}
           className="absolute hover:scale-105 icon-close top-2 right-2 text-xl w-6 cursor-pointer rounded-4xl  text-black"

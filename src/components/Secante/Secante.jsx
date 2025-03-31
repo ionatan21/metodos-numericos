@@ -109,7 +109,7 @@ export default function Secante() {
         explanation={explicacion}
       />
 
-      <section className="secante-container mt-20 mb-5 transition-all duration-300 animate-fade-in-down">
+      <section className="secante-container mt-24 mb-5 transition-all duration-300 animate-fade-in-down">
         <button
           onClick={openModal}
           className="rounded-md mb-4 border-2 transform disabled:opacity-50"
