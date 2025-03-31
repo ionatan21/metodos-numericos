@@ -31,15 +31,15 @@ export default function Secante() {
     const explicacionGenerada = `
       El Método de Secante se utiliza para encontrar la raíz de una función continua. 
       // 1. En este caso, tenemos la función f(x) = ${ecuacion}.
-      //Dados los puntos iniciales X0 = ${x0} y X1 = ${x1}, 
-      // 2. Se calculan los valores de la función en esos puntos:
+      // 2. Dados los puntos iniciales X0 = ${x0} y X1 = ${x1}, se calculan los valores de la función en esos puntos:
       // f(X0) = ${fx0.toFixed(6)} y f(X1) = ${fx1.toFixed(6)}.
       // 3. Se calcula el siguiente valor Xn utilizando la fórmula:
       //Xn = X1 - (f(X1) * (X1 - X0)) / (f(X1) - f(X0))
-      // 4. Sustituyendo los valores obtenidos, tenemos:
-      // Xn = ${x1} - (${fx1.toFixed(6)} * (${x1} - ${x0})) / (${fx1.toFixed(
+      // 4. Sustituyendo los valores obtenidos, tenemos: Xn = ${x1} - (${fx1.toFixed(
       6
-    )} - ${fx0.toFixed(6)}) = ${resultados[0]?.xn.toFixed(6)}
+    )} * (${x1} - ${x0})) / (${fx1.toFixed(6)} - ${fx0.toFixed(
+      6
+    )}) = ${resultados[0]?.xn.toFixed(6)}
       // 5. Ahora se evalúa la función en el nuevo punto Xn:
       // f(Xn) = ${resultados[0]?.fxn.toFixed(6)}
       // 6. En cada iteración, se repiten los pasos anteriores, actualizando los valores de X0 y X1 con el valor de Xn y Xn-1.
