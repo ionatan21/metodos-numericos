@@ -335,6 +335,8 @@ export default function Biseccion() {
           </section>
         </div>
       </section>
+
+      
     </>
   );
 }
