@@ -33,15 +33,26 @@ export default function Biseccion() {
     const fa = evaluarFuncion(ecuacion, a);
     const fb = evaluarFuncion(ecuacion, b);
     const fxi = evaluarFuncion(ecuacion, (a + b) / 2).toFixed(6);
+    const xi = resultados[0].xi.toFixed(6);
     let newa = 0;
     let newb = 0;
 
     if (fa * fxi < 0) {
-      newa = a;
-      newb = (a + b) / 2;
+      if (a < xi) {
+        newa = a;
+        newb = (a + b) / 2;
+      } else {
+        newa = (a + b) / 2;
+        newb = a;
+      }
     } else {
-      newa = (a + b) / 2;
-      newb = b;
+      if (b < xi) {
+        newa = b;
+        newb = (a + b) / 2;
+      } else {
+        newa = (a + b) / 2;
+        newb = b;
+      }
     }
 
     if (fa === null || fb === null) {

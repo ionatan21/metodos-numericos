@@ -1,19 +1,326 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
+import { metodoSecante, evaluarFuncion } from "./functions";
+import Modal from "../Utils/Modal";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 
-export default function ReglaFalse() {
-  const [dots, setDots] = useState('');
+export default function Secante() {
+  const [ecuacion, setEcuacion] = useState("sqrt(x)-cos(x)");
+  const [ecuacionajax, setEcuacionajax] = useState(" \\sqrt{x} -  \\cos(x)");
+
+  const [x0, setX0] = useState(0);
+  const [x1, setX1] = useState(1);
+  const [resultados, setResultados] = useState([]);
+  const [resultadosSn, setResultadosSn] = useState([]);
+  const [mostrarNotacionCientifica, setMostrarNotacionCientifica] =
+    useState(true);
+  const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [explicacion, setExplicacion] = useState("");
+  const [isEvaluado, setIsEvaluado] = useState(false);
+
+  const [mathJaxKey, setMathJaxKey] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDots((prev) => (prev.length < 3 ? prev + '.' : ''));
-    }, 500);
+    if (window.MathJax) {
+      window.MathJax.typeset();
+    }
+  }, [ecuacionajax]);
 
-    return () => clearInterval(interval);
-  }, []);
+  const generarExplicacion = () => {
+    const fx0 = evaluarFuncion(ecuacion, x0);
+    const fx1 = evaluarFuncion(ecuacion, x1);
+    const xn = resultados[0]?.xn.toFixed(6);
+    const fxn = resultados[0]?.fxn.toFixed(6);
+    let newa = 0;
+    let newb = 0;
+
+    if (fxn * fx0 < 0) {
+      if (fxn > fx0) {
+        newa = x0;
+        newb = xn;
+      } else {
+        newa = xn;
+        newb = x0;
+      }
+    } else {
+      if (fxn > fx1) {
+        newa = x1;
+        newb = xn;
+      } else {
+        newa = xn;
+        newb = x1;
+      }
+    }
+
+    const explicacionGenerada = `
+      El Método de Regla Falsa se utiliza para encontrar la raíz de una función continua. 
+      // 1. En este caso, tenemos la función f(x) = ${ecuacion}.
+      // 2. Dados los puntos iniciales X0 = ${x0} y X1 = ${x1}, se calculan los valores de la función en esos puntos: f(X0) = ${fx0.toFixed(
+      2
+    )} y f(X1) = ${fx1.toFixed(2)}.
+      // 3. Se calcula el siguiente valor Xn utilizando la fórmula:
+      //Xn = X1 - (f(X1) * (X1 - X0)) / (f(X1) - f(X0))
+      // 4. Sustituyendo los valores obtenidos, tenemos: Xn = ${x1} - (${fx1.toFixed(
+      6
+    )} * (${x1} - ${x0})) / (${fx1.toFixed(2)} - ${fx0.toFixed(2)}) = ${fxn}
+      // 5. Ahora se evalúa la función en el nuevo punto Xn: f(Xn) = ${resultados[0]?.fxn.toFixed(
+        6
+      )}
+      // 6. En cada iteración, se evualuan f(Xn) con f(X0) y f(X1) buscando cual de estos tiene signo contrario con f(Xn)
+      //
+      // en este caso el nuevo valor para segunda iteración de X0 es ${newa} y el nuevo valor de X1 es ${newb}.
+      //Este proceso se repite iterativamente hasta obtener una aproximación suficiente.
+    `;
+
+    setExplicacion(explicacionGenerada);
+    setIsModalOpen(true);
+  };
+
+  const openModal = () => {
+    generarExplicacion();
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  function toScientificNotation(num, precision = 1) {
+    if (num === 0) return "0"; // Manejar el caso especial de 0
+    let exponent = Math.floor(Math.log10(Math.abs(num)));
+    let coefficient = (num / Math.pow(10, exponent)).toFixed(precision);
+    return `${coefficient}*10^${exponent}`;
+  }
+
+  function convertArrayToScientific(arr) {
+    return arr.map((entry) => {
+      let newEntry = { ...entry };
+      for (let key in entry) {
+        if (key !== "iteracion" && typeof entry[key] === "number") {
+          newEntry[key] = toScientificNotation(entry[key]);
+        }
+      }
+      return newEntry;
+    });
+  }
+
+  function redondearDatos(array) {
+    return array.map((obj) => ({
+      iteracion: obj.iteracion, // Mantener la iteración sin cambios
+      ...Object.fromEntries(
+        Object.entries(obj)
+          .filter(([key]) => key !== "iteracion") // Excluir "iteracion" del procesamiento
+          .map(([key, value]) => [
+            key,
+            typeof value === "number" ? parseFloat(value.toFixed(6)) : value,
+          ])
+      ),
+    }));
+  }
+
+  function formatMathJaxString(input) {
+    return input.replace(/\\/g, "").replace(/{/g, "(").replace(/}/g, ")");
+  }
+
+  function convertirMinusculas(texto) {
+    return texto.toLowerCase();
+  }
+
+  const handleChange = (e) => {
+    const valor = convertirMinusculas(e.target.value);
+    setEcuacionajax(valor);
+    const ecuacionTransformada = formatMathJaxString(valor);
+    setEcuacion(ecuacionTransformada);
+    setMathJaxKey((prevKey) => prevKey + 1);
+  };
+
+  const calcular = () => {
+    const { resultados, error } = metodoSecante(
+      ecuacion,
+      parseFloat(x0),
+      parseFloat(x1)
+    );
+    if (error) {
+      setError(error);
+      setResultados([]);
+      setIsEvaluado(false);
+    } else {
+      setError(null);
+
+      setResultados(redondearDatos(resultados)); // Redondear a 6 decimales
+      setResultadosSn(convertArrayToScientific(resultados)); // Convertir a notación científica
+      setIsEvaluado(true);
+    }
+    const result = document.getElementById("resultado");
+    setTimeout(() => {
+      if (result) {
+        result.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 100);
+  };
+
+  // Agregar expresión seleccionada en el input
+  const insertarEnInput = (valor) => {
+    setEcuacion((prev) => prev + valor);
+  };
+
+  const insertarEnAjax = (valor) => {
+    setEcuacionajax((prev) => prev + valor);
+  };
+
+  function enfocarInput() {
+    document.getElementById("miInput").focus();
+  }
 
   return (
-    <div>
-      <h2>En desarrollo{dots}</h2>
-    </div>
+    <>
+      <Modal
+        isOpen={isModalOpen}
+        closeModal={closeModal}
+        title="Explicación del Método de Regla Falsa"
+        explanation={explicacion}
+      />
+
+      <section className="secante-container mt-24 mb-5 transition-all duration-300 animate-fade-in-down">
+        <button
+          onClick={openModal}
+          className="rounded-md mb-4 border-2 transform disabled:opacity-50"
+          disabled={!isEvaluado}
+        >
+          Ver Explicación
+        </button>
+
+        <div className="p-6 mt-4 max-w-[90vw] mx-auto shadow-md rounded-lg border-1 method-container border-black">
+          <h2 className="text-2xl font-bold my-4">Método de Regla Falsa</h2>
+          <div className="mb-4">
+            <label className="block font-semibold">Ecuación:</label>
+            <div className="mt-4 p-2 bg-transparent rounded-lg text-center">
+              <input
+                type="text"
+                value={ecuacionajax}
+                onChange={handleChange}
+                className="border p-2 w-full rounded-lg text-center mb-4"
+                id="miInput"
+              />
+              <MathJaxContext key={mathJaxKey}>
+                <MathJax>{"\\(" + ecuacionajax + "\\)"}</MathJax>
+              </MathJaxContext>
+            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {[
+              { label: "x²", value: "^2", latex: "^{2}" },
+              { label: "√x", value: "sqrt(x)", latex: " \\sqrt{x}" },
+              { label: "π", value: "pi", latex: " \\pi" },
+              { label: "e", value: "e", latex: " e" },
+              { label: "sin", value: "sin(", latex: " \\sin(" },
+              { label: "cos", value: "cos(", latex: " \\cos(" },
+              { label: "tan", value: "tan(", latex: " \\tan(" },
+              { label: "ln", value: "ln(", latex: " \\ln(" },
+              { label: "(", value: "(", latex: "(" },
+              { label: ")", value: ")", latex: ")" },
+              { label: "^", value: "^", latex: "^{}" },
+              { label: "/", value: "/", latex: "/" },
+              { label: "*", value: "*", latex: "\\cdot" }, // Para representar multiplicación en LaTeX
+              { label: "+", value: "+", latex: "+" },
+              { label: "-", value: "-", latex: "-" },
+              { label: "C", value: "clear", latex: " " }, // No tiene representación en LaTeX
+            ].map((btn) => (
+              <button
+                key={btn.label}
+                className="bg-gray-200 border-1 opacity-80 hover:opacity-100 border-black p-2 rounded hover:bg-gray-300 shadow-md text-black font-semibold"
+                onClick={() => {
+                  if (btn.value === "clear") {
+                    setEcuacion(""); // Botón de limpiar
+                    setEcuacionajax(" "); // Limpiar el input de MathJax
+                    enfocarInput();
+                  } else {
+                    insertarEnInput(btn.value);
+                    insertarEnAjax(btn.latex);
+                    enfocarInput();
+                  } // Agregar valor al input
+                }}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block font-semibold">Valor X0:</label>
+              <input
+                type="number"
+                value={x0}
+                onChange={(e) => setX0(e.target.value)}
+                className="border p-2 w-full rounded-lg text-center shadow-md"
+              />
+            </div>
+            <div>
+              <label className="block font-semibold">Valor X1:</label>
+              <input
+                type="number"
+                value={x1}
+                onChange={(e) => setX1(e.target.value)}
+                className="border p-2 w-full rounded-lg text-center shadow-md"
+              />
+            </div>
+          </div>
+          <div className="w-full  flex justify-center items-center mt-4">
+            <button
+              onClick={calcular}
+              className="bg-gray-400 h-11 w-full border-1  border-black border-e-black shadow-md text-black px-4 py-[10px] rounded"
+            >
+              Calcular
+            </button>
+
+            <select
+              className="ml-4 border-1 h-11 w-full border-black rounded-lg px-4 py-[10px] shadow-md"
+              onChange={(e) =>
+                setMostrarNotacionCientifica(e.target.value === "sn")
+              }
+            >
+              <option value="sn">Not Científica</option>
+              <option value="decimal">Not Decimal</option>
+            </select>
+          </div>
+
+          <section id="resultado">
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+            {resultados.length > 0 && (
+              <div className="mt-4 overflow-x-auto animate-fade-in-down">
+                <table className="min-w-full border-collapse border border-gray-300">
+                  <thead>
+                    <tr>
+                      <th className="border p-2">Iteración</th>
+                      <th className="border p-2">X0</th>
+                      <th className="border p-2">f(X0)</th>
+                      <th className="border p-2">X1</th>
+                      <th className="border p-2">f(X1)</th>
+                      <th className="border p-2">Xn</th>
+                      <th className="border p-2">f(Xn)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(mostrarNotacionCientifica
+                      ? resultadosSn
+                      : resultados
+                    ).map((row, index) => (
+                      <tr key={index}>
+                        <td className="border p-2">{row.iteracion}</td>
+                        <td className="border p-2">{row.x0}</td>
+                        <td className="border p-2">{row.fx0}</td>
+                        <td className="border p-2">{row.x1}</td>
+                        <td className="border p-2">{row.fx1}</td>
+                        <td className="border p-2">{row.xn}</td>
+                        <td className="border p-2">{row.fxn}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
+      </section>
+    </>
   );
 }

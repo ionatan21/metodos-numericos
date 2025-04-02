@@ -31,13 +31,27 @@ export function metodoBiseccion(ecuacion, a, b, maxIteraciones = 10) {
     }
 
     if (fa * fxi < 0) {
-      b = xi;
-      fb = fxi;
+      if (a < xi) {
+        b = xi;
+        fb = fxi;
+      } else {
+        a = fxi;
+        fa = fxi;
+        b = a;
+        fb = fa;
+      }
     } else {
-      a = xi;
-      fa = fxi;
+      if (b < xi) {
+        a = b;
+        fa = fxb;
+        b = xi;
+        fb = fxi;
+      } else {
+        a = xi;
+        fa = fxi;
+      }
     }
   }
- 
+
   return { resultados };
 }
