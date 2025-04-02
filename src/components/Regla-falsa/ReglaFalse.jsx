@@ -62,11 +62,11 @@ export default function Secante() {
       //Xn = X1 - (f(X1) * (X1 - X0)) / (f(X1) - f(X0))
       // 4. Sustituyendo los valores obtenidos, tenemos: Xn = ${x1} - (${fx1.toFixed(
       6
-    )} * (${x1} - ${x0})) / (${fx1.toFixed(2)} - ${fx0.toFixed(2)}) = ${fxn}
+    )} * (${x1} - ${x0})) / (${fx1.toFixed(2)} - ${fx0.toFixed(2)}) = ${xn}
       // 5. Ahora se evalúa la función en el nuevo punto Xn: f(Xn) = ${resultados[0]?.fxn.toFixed(
         6
       )}
-      // 6. En cada iteración, se evualuan f(Xn) con f(X0) y f(X1) buscando cual de estos tiene signo contrario con f(Xn)
+      // 6. En cada iteración, se evalúan f(Xn) con f(X0) y f(X1) buscando cuál de estos tiene signo contrario con f(Xn)
       //
       // en este caso el nuevo valor para segunda iteración de X0 es ${newa} y el nuevo valor de X1 es ${newb}.
       //Este proceso se repite iterativamente hasta obtener una aproximación suficiente.
