@@ -62,8 +62,8 @@ export const metodoSecante = (ecuacion, x0, x1) => {
         x1 = x1;
         x0 = xn;
       } else {
-        x0 = x1; // 2
-        x1 = xn; // 3
+        x0 = x1; 
+        x1 = xn; 
       }
     }
 

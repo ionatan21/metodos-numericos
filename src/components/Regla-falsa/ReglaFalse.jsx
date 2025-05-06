@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { metodoSecante, evaluarFuncion } from "./functions";
 import Modal from "../Utils/Modal";
 import { MathJax, MathJaxContext } from "better-react-mathjax";
+import {
+  convertArrayToScientific,
+  convertirMinusculas,
+  formatMathJaxString,
+  redondearDatos,
+} from "../Utils/general-functions";
+import MathButtonGrid from "../Utils/MathButtonGrid";
 
 export default function Secante() {
   const [ecuacion, setEcuacion] = useState("sqrt(x)-cos(x)");
@@ -84,47 +91,6 @@ export default function Secante() {
     setIsModalOpen(false);
   };
 
-  function toScientificNotation(num, precision = 1) {
-    if (num === 0) return "0"; // Manejar el caso especial de 0
-    let exponent = Math.floor(Math.log10(Math.abs(num)));
-    let coefficient = (num / Math.pow(10, exponent)).toFixed(precision);
-    return `${coefficient}*10^${exponent}`;
-  }
-
-  function convertArrayToScientific(arr) {
-    return arr.map((entry) => {
-      let newEntry = { ...entry };
-      for (let key in entry) {
-        if (key !== "iteracion" && typeof entry[key] === "number") {
-          newEntry[key] = toScientificNotation(entry[key]);
-        }
-      }
-      return newEntry;
-    });
-  }
-
-  function redondearDatos(array) {
-    return array.map((obj) => ({
-      iteracion: obj.iteracion, // Mantener la iteración sin cambios
-      ...Object.fromEntries(
-        Object.entries(obj)
-          .filter(([key]) => key !== "iteracion") // Excluir "iteracion" del procesamiento
-          .map(([key, value]) => [
-            key,
-            typeof value === "number" ? parseFloat(value.toFixed(6)) : value,
-          ])
-      ),
-    }));
-  }
-
-  function formatMathJaxString(input) {
-    return input.replace(/\\/g, "").replace(/{/g, "(").replace(/}/g, ")");
-  }
-
-  function convertirMinusculas(texto) {
-    return texto.toLowerCase();
-  }
-
   const handleChange = (e) => {
     const valor = convertirMinusculas(e.target.value);
     setEcuacionajax(valor);
@@ -163,8 +129,23 @@ export default function Secante() {
     setEcuacion((prev) => prev + valor);
   };
 
-  const insertarEnAjax = (valor) => {
-    setEcuacionajax((prev) => prev + valor);
+  const insertarEnAjax = (valor, cursorOffset = 0) => {
+    const input = document.getElementById("miInput");
+    if (!input) return;
+
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+
+    const newValue =
+      ecuacionajax.slice(0, start) + valor + ecuacionajax.slice(end);
+    setEcuacionajax(newValue);
+
+    // Esperamos un tick para colocar el cursor en la nueva posición
+    setTimeout(() => {
+      const pos = start + valor.length + cursorOffset;
+      input.setSelectionRange(pos, pos);
+      input.focus();
+    }, 0);
   };
 
   function enfocarInput() {
@@ -206,44 +187,13 @@ export default function Secante() {
               </MathJaxContext>
             </div>
           </div>
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            {[
-              { label: "x²", value: "^2", latex: "^{2}" },
-              { label: "√x", value: "sqrt(x)", latex: " \\sqrt{x}" },
-              { label: "π", value: "pi", latex: " \\pi" },
-              { label: "e", value: "e", latex: " e" },
-              { label: "sin", value: "sin(", latex: " \\sin(" },
-              { label: "cos", value: "cos(", latex: " \\cos(" },
-              { label: "tan", value: "tan(", latex: " \\tan(" },
-              { label: "ln", value: "ln(", latex: " \\ln(" },
-              { label: "(", value: "(", latex: "(" },
-              { label: ")", value: ")", latex: ")" },
-              { label: "^", value: "^", latex: "^{}" },
-              { label: "/", value: "/", latex: "/" },
-              { label: "*", value: "*", latex: "\\cdot" }, // Para representar multiplicación en LaTeX
-              { label: "+", value: "+", latex: "+" },
-              { label: "-", value: "-", latex: "-" },
-              { label: "C", value: "clear", latex: " " }, // No tiene representación en LaTeX
-            ].map((btn) => (
-              <button
-                key={btn.label}
-                className="bg-gray-200 border-1 opacity-80 hover:opacity-100 border-black p-2 rounded hover:bg-gray-300 shadow-md text-black font-semibold"
-                onClick={() => {
-                  if (btn.value === "clear") {
-                    setEcuacion(""); // Botón de limpiar
-                    setEcuacionajax(" "); // Limpiar el input de MathJax
-                    enfocarInput();
-                  } else {
-                    insertarEnInput(btn.value);
-                    insertarEnAjax(btn.latex);
-                    enfocarInput();
-                  } // Agregar valor al input
-                }}
-              >
-                {btn.label}
-              </button>
-            ))}
-          </div>
+          <MathButtonGrid
+            insertarEnInput={insertarEnInput}
+            insertarEnAjax={insertarEnAjax}
+            setEcuacion={setEcuacion}
+            setEcuacionajax={setEcuacionajax}
+            enfocarInput={enfocarInput}
+          />
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block font-semibold">Valor X0:</label>
